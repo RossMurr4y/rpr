@@ -10,9 +10,8 @@ use serde::{Serialize, Deserialize};
 /// The following example shows a single Remote configured.
 /// 
 /// ```toml
-/// [remotes]
+/// [[remotes]]
 /// 
-/// [[remote]]
 /// name = "My Example Repository"
 /// description = "Singleton configured remote repository"
 /// url = "https://github.com/org/repo.git"
@@ -20,7 +19,27 @@ use serde::{Serialize, Deserialize};
 /// ```
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
-    remotes: Option<Vec<Remote>>,
+    pub remotes: Option<Vec<Remote>>,
+}
+
+impl Config {
+
+    /// Deserialise a TOML file (as a string) into Config
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// let mystr = r#"
+    /// [[remotes]]
+    /// name = "My Example Repository"
+    /// description = "Singleton configured remote repository"
+    /// "#;
+    /// let mut test = Config::from_toml(mystr.to_string());
+    /// println!("got me a: {:#?}", test);
+    /// ```
+    pub fn from_toml (input: String) -> Self {
+        toml::from_str(&input).unwrap()
+    }
 }
 
 /// Remote repository configuration to be used by RPR
@@ -33,9 +52,8 @@ pub struct Config {
 /// # Example
 /// 
 /// ```toml
-/// [remotes]
+/// [[remotes]]
 /// 
-/// [[remote]]
 /// name = "repository"
 /// description = "My helpful descriptor"
 /// url = "https://github.com/examplefork/rpr.git"
@@ -47,12 +65,12 @@ pub struct Config {
 /// ```
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Remote {
-    name: Option<String>,
-    description: Option<String>,
-    url: Option<String>,
-    upstream: Option<String>,
-    branch: Option<String>,
-    path: Option<String>,
-    org: Option<String>,
-    platform: Option<String>,
+    pub name: Option<String>,
+    pub description: Option<String>,
+    pub url: Option<String>,
+    pub upstream: Option<String>,
+    pub branch: Option<String>,
+    pub path: Option<String>,
+    pub org: Option<String>,
+    pub platform: Option<String>,
 }

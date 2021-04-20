@@ -46,5 +46,15 @@ pub mod config;
 pub mod cli;
 
 fn main() {
+    use config::{Config};
     cli::process_args();
+
+    let mystr = r#"
+    [[remotes]]
+    name = "My Example Repository"
+    description = "Singleton configured remote repository"
+    "#;
+
+    let mut test = Config::from_toml(mystr.to_string());
+    println!("got me a: {:#?}", test.remotes.unwrap()[0].name);
 }
