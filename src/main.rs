@@ -39,20 +39,12 @@
 //! Whilst some of the capabilities of git may be surfaced, Reaper's mission
 //! is to help users orchestrate and navigate and maintain their local workspace.
 
-use clap::{Arg, App};
-
-/// Contains definitions for the Reaper configuration as well as interactions with it.
+/// Definitions for the Reaper configuration as well as interactions with it.
 pub mod config;
 
+/// Definitions for the Reaper CLI subcommands, arguments and associated configuration.
+pub mod cli;
+
 fn main() {
-    let _matches = App::new("Reaper")
-        .version("0.0.0")
-        .author("Ross Murray - @rossmurr4y")
-        .arg(Arg::with_name("config")
-            .short("c")
-            .long("config")
-            .value_name("FILE")
-            .help("A custom Documancy config file to use. Defaults to ~/reaper.toml")
-            .takes_value(true))
-        .get_matches();
+    cli::process_args();
 }
