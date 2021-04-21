@@ -19,6 +19,7 @@ use serde::{Serialize, Deserialize};
 /// ```
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
+    /// remote git repositories
     pub remotes: Option<Vec<Remote>>,
 }
 
@@ -65,12 +66,20 @@ impl Config {
 /// ```
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Remote {
+    /// A human-readable identifier for the remote.
     pub name: Option<String>,
+    /// A brief descriptor for the remote - purely for identification purposes only.
     pub description: Option<String>,
+    /// The URL of the remote.
     pub url: Option<String>,
+    /// An URL of a upstream fork of the remote.
     pub upstream: Option<String>,
+    /// The primary branch of the remote.
     pub branch: Option<String>,
+    /// A path within the repository to the target content.
     pub path: Option<String>,
+    /// An organisation to which this remote belongs.
     pub org: Option<String>,
+    /// The git platform of the remote repository.
     pub platform: Option<String>,
 }
