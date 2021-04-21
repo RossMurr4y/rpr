@@ -50,11 +50,11 @@ fn main() {
     cli::process_args();
 
     let mystr = r#"
-    [[remotes]]
+    [[remote]]
     name = "My Example Repository"
     description = "Singleton configured remote repository"
     "#;
 
-    let mut test = Config::from_toml(mystr.to_string());
-    println!("got me a: {:#?}", test.remotes.unwrap()[0].name);
+    let test = Config::from_toml(mystr.to_string());
+    assert_eq!(test.remote.is_some(), true);
 }

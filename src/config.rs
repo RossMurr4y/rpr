@@ -10,7 +10,7 @@ use serde::{Serialize, Deserialize};
 /// The following example shows a single Remote configured.
 /// 
 /// ```toml
-/// [[remotes]]
+/// [[remote]]
 /// 
 /// name = "My Example Repository"
 /// description = "Singleton configured remote repository"
@@ -20,7 +20,7 @@ use serde::{Serialize, Deserialize};
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
     /// remote git repositories
-    pub remotes: Option<Vec<Remote>>,
+    pub remote: Option<Vec<Remote>>,
 }
 
 impl Config {
@@ -31,12 +31,12 @@ impl Config {
     /// 
     /// ```
     /// let mystr = r#"
-    /// [[remotes]]
+    /// [[remote]]
     /// name = "My Example Repository"
     /// description = "Singleton configured remote repository"
     /// "#;
-    /// let mut test = Config::from_toml(mystr.to_string());
-    /// println!("got me a: {:#?}", test);
+    /// let test = Config::from_toml(mystr.to_string());
+    /// assert_eq!(test.remote.is_some(), true);
     /// ```
     pub fn from_toml (input: String) -> Self {
         toml::from_str(&input).unwrap()
@@ -53,7 +53,7 @@ impl Config {
 /// # Example
 /// 
 /// ```toml
-/// [[remotes]]
+/// [[remote]]
 /// 
 /// name = "repository"
 /// description = "My helpful descriptor"
@@ -82,4 +82,51 @@ pub struct Remote {
     pub org: Option<String>,
     /// The git platform of the remote repository.
     pub platform: Option<String>,
+}
+
+#[cfg(test)]
+mod tests {
+
+    use crate::config::{Config};
+
+    #[test]
+    fn config_from_toml_str_no_remote() {
+        let s = r#"
+        "#;
+        let r = Config::from_toml(s.to_string());
+        assert_eq!(r.remote.is_none(), true);
+    }
+
+    #[test]
+    fn config_from_toml_str_single_remote() {
+        let s = r#"
+        [[remote]]
+        name = "My Example Repository"
+        description = "Singleton configured remote repository"
+        "#;
+        let r = Config::from_toml(s.to_string());
+        assert_eq!(r.remote.is_some(), true);
+    }
+
+    #[test]
+    fn config_from_toml_str_multi_remote() {
+        let s = r#"
+        [[remote]]
+        name = "repository"
+        description = "My helpful descriptor"
+        url = "https://github.com/examplefork/rpr.git"
+        upstream = "https://github.com/rossmurr4y/rpr.git"
+        branch = "main"
+        path = "docs/"
+        org = "exampleorg"
+        platform = "github"
+        
+        [[remote]]
+        name = "My Example Repository"
+        description = "Singleton configured remote repository"
+        "#;
+        let r = Config::from_toml(s.to_string());
+        assert_eq!(r.remote.is_some(), true);
+    }
+
 }
