@@ -59,6 +59,8 @@
 <span id="56">56</span>
 <span id="57">57</span>
 <span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
 <span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_doc_code_examples</span>)]</span>
@@ -101,22 +103,24 @@
 <span class="doccomment">//! Whilst some of the capabilities of git may be surfaced, Reaper&#39;s mission</span>
 <span class="doccomment">//! is to help users orchestrate and navigate and maintain their local workspace.</span>
 
-<span class="kw">use</span> <span class="ident">clap</span>::{<span class="ident">Arg</span>, <span class="ident">App</span>};
-
-<span class="doccomment">/// Contains definitions for the Reaper configuration as well as interactions with it.</span>
+<span class="doccomment">/// Definitions for the Reaper configuration as well as interactions with it.</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">config</span>;
 
+<span class="doccomment">/// Definitions for the Reaper CLI subcommands, arguments and associated configuration.</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">cli</span>;
+
 <span class="kw">fn</span> <span class="ident">main</span>() {
-    <span class="kw">let</span> <span class="ident">_matches</span> <span class="op">=</span> <span class="ident">App</span>::<span class="ident">new</span>(<span class="string">&quot;Reaper&quot;</span>)
-        .<span class="ident">version</span>(<span class="string">&quot;0.0.0&quot;</span>)
-        .<span class="ident">author</span>(<span class="string">&quot;Ross Murray - @rossmurr4y&quot;</span>)
-        .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;config&quot;</span>)
-            .<span class="ident">short</span>(<span class="string">&quot;c&quot;</span>)
-            .<span class="ident">long</span>(<span class="string">&quot;config&quot;</span>)
-            .<span class="ident">value_name</span>(<span class="string">&quot;FILE&quot;</span>)
-            .<span class="ident">help</span>(<span class="string">&quot;A custom Documancy config file to use. Defaults to ~/reaper.toml&quot;</span>)
-            .<span class="ident">takes_value</span>(<span class="bool-val">true</span>))
-        .<span class="ident">get_matches</span>();
+    <span class="kw">use</span> <span class="ident">config</span>::{<span class="ident">Config</span>};
+    <span class="ident">cli</span>::<span class="ident">process_args</span>();
+
+    <span class="kw">let</span> <span class="ident">mystr</span> <span class="op">=</span> <span class="string">r#&quot;
+    [[remote]]
+    name = &quot;My Example Repository&quot;
+    description = &quot;Singleton configured remote repository&quot;
+    &quot;#</span>;
+
+    <span class="kw">let</span> <span class="ident">test</span> <span class="op">=</span> <span class="ident">Config</span>::<span class="ident">from_toml</span>(<span class="ident">mystr</span>.<span class="ident">to_string</span>());
+    <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">test</span>.<span class="ident">remote</span>.<span class="ident">is_some</span>(), <span class="bool-val">true</span>);
 }</pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rpr"></div>
     <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
