@@ -7,3 +7,6 @@ target/
 **/*.rs.bk
 
 .DS_Store
+
+# IDE-specific
+.vscode
