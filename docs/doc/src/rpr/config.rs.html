@@ -133,8 +133,49 @@
 <span id="130">130</span>
 <span id="131">131</span>
 <span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>};
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">path</span>::<span class="ident">Path</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::{<span class="prelude-ty">Result</span>};
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fs</span>;
 
 <span class="doccomment">/// Reaper reads and stores configuration as TOML. It is either</span>
 <span class="doccomment">/// user-provided or created new by RPR. </span>
@@ -174,8 +215,15 @@
     <span class="doccomment">/// let test = Config::from_toml(mystr.to_string());</span>
     <span class="doccomment">/// assert_eq!(test.remote.is_some(), true);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_toml</span> (<span class="ident">input</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident">toml</span>::<span class="ident">from_str</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>).<span class="ident">unwrap</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_toml</span> (<span class="ident">input</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">toml</span>::<span class="ident">from_str</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>).<span class="ident">unwrap</span>())
+    }
+
+    <span class="doccomment">/// Deserialise a file from a filepath into Config</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_filepath</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+            <span class="kw">let</span> <span class="ident">file_content</span> <span class="op">=</span> <span class="ident">fs</span>::<span class="ident">read_to_string</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">conf</span> <span class="op">=</span> <span class="ident">Config</span>::<span class="ident">from_toml</span>(<span class="ident">file_content</span>);
+            <span class="ident">conf</span>
     }
 }
 
@@ -224,13 +272,16 @@
 <span class="kw">mod</span> <span class="ident">tests</span> {
 
     <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">config</span>::{<span class="ident">Config</span>};
+    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">Write</span>;
+    <span class="kw">use</span> <span class="ident">tempfile</span>::<span class="ident">NamedTempFile</span>;
+
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">config_from_toml_str_no_remote</span>() {
         <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="string">r#&quot;
         &quot;#</span>;
         <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">Config</span>::<span class="ident">from_toml</span>(<span class="ident">s</span>.<span class="ident">to_string</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">r</span>.<span class="ident">remote</span>.<span class="ident">is_none</span>(), <span class="bool-val">true</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">r</span>.<span class="ident">unwrap</span>().<span class="ident">remote</span>.<span class="ident">is_none</span>(), <span class="bool-val">true</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -241,7 +292,7 @@
         description = &quot;Singleton configured remote repository&quot;
         &quot;#</span>;
         <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">Config</span>::<span class="ident">from_toml</span>(<span class="ident">s</span>.<span class="ident">to_string</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">r</span>.<span class="ident">remote</span>.<span class="ident">is_some</span>(), <span class="bool-val">true</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">r</span>.<span class="ident">unwrap</span>().<span class="ident">remote</span>.<span class="ident">is_some</span>(), <span class="bool-val">true</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -262,7 +313,32 @@
         description = &quot;Singleton configured remote repository&quot;
         &quot;#</span>;
         <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">Config</span>::<span class="ident">from_toml</span>(<span class="ident">s</span>.<span class="ident">to_string</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">r</span>.<span class="ident">remote</span>.<span class="ident">is_some</span>(), <span class="bool-val">true</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">r</span>.<span class="ident">unwrap</span>().<span class="ident">remote</span>.<span class="ident">is_some</span>(), <span class="bool-val">true</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">config_from_filepath</span>() {
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">NamedTempFile</span>::<span class="ident">new</span>().<span class="ident">unwrap</span>();
+
+        <span class="macro">write</span><span class="macro">!</span>(<span class="ident">file</span>, <span class="string">r#&quot;
+            [[remote]]
+            name = &quot;repository&quot;
+            description = &quot;My helpful descriptor&quot;
+            url = &quot;https://github.com/examplefork/rpr.git&quot;
+            upstream = &quot;https://github.com/rossmurr4y/rpr.git&quot;
+            branch = &quot;main&quot;
+            path = &quot;docs/&quot;
+            org = &quot;exampleorg&quot;
+            platform = &quot;github&quot;
+            
+            [[remote]]
+            name = &quot;My Example Repository&quot;
+            description = &quot;Singleton configured remote repository&quot;
+            &quot;#</span>);
+        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">file</span>.<span class="ident">into_temp_path</span>();
+        <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">Config</span>::<span class="ident">from_filepath</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">config</span>.<span class="ident">is_ok</span>(), <span class="bool-val">true</span>);
     }
 
 }</pre></div>
