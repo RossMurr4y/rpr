@@ -55,6 +55,7 @@ fn main() {
     description = "Singleton configured remote repository"
     "#;
 
-    let test = Config::from_toml(mystr.to_string());
-    assert_eq!(test.remote.is_some(), true);
+    let result = Config::from_toml(mystr.to_string());
+    
+    assert_eq!(result.unwrap().remote.is_some(), true);
 }

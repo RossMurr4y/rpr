@@ -1,4 +1,7 @@
 use serde::{Serialize, Deserialize};
+use std::path::Path;
+use std::io::{Result};
+use std::fs;
 
 /// Reaper reads and stores configuration as TOML. It is either
 /// user-provided or created new by RPR. 
@@ -38,8 +41,15 @@ impl Config {
     /// let test = Config::from_toml(mystr.to_string());
     /// assert_eq!(test.remote.is_some(), true);
     /// ```
-    pub fn from_toml (input: String) -> Self {
-        toml::from_str(&input).unwrap()
+    pub fn from_toml (input: String) -> Result<Self> {
+        Ok(toml::from_str(&input).unwrap())
+    }
+
+    /// Deserialise a file from a filepath into Config
+    pub fn from_filepath(input: &Path) -> Result<Self> {
+            let file_content = fs::read_to_string(&input)?;
+            let conf = Config::from_toml(file_content);
+            conf
     }
 }
 
@@ -88,13 +98,16 @@ pub struct Remote {
 mod tests {
 
     use crate::config::{Config};
+    use std::io::Write;
+    use tempfile::NamedTempFile;
+
 
     #[test]
     fn config_from_toml_str_no_remote() {
         let s = r#"
         "#;
         let r = Config::from_toml(s.to_string());
-        assert_eq!(r.remote.is_none(), true);
+        assert_eq!(r.unwrap().remote.is_none(), true);
     }
 
     #[test]
@@ -105,7 +118,7 @@ mod tests {
         description = "Singleton configured remote repository"
         "#;
         let r = Config::from_toml(s.to_string());
-        assert_eq!(r.remote.is_some(), true);
+        assert_eq!(r.unwrap().remote.is_some(), true);
     }
 
     #[test]
@@ -126,7 +139,32 @@ mod tests {
         description = "Singleton configured remote repository"
         "#;
         let r = Config::from_toml(s.to_string());
-        assert_eq!(r.remote.is_some(), true);
+        assert_eq!(r.unwrap().remote.is_some(), true);
+    }
+
+    #[test]
+    fn config_from_filepath() {
+
+        let mut file = NamedTempFile::new().unwrap();
+
+        write!(file, r#"
+            [[remote]]
+            name = "repository"
+            description = "My helpful descriptor"
+            url = "https://github.com/examplefork/rpr.git"
+            upstream = "https://github.com/rossmurr4y/rpr.git"
+            branch = "main"
+            path = "docs/"
+            org = "exampleorg"
+            platform = "github"
+            
+            [[remote]]
+            name = "My Example Repository"
+            description = "Singleton configured remote repository"
+            "#);
+        let path = &file.into_temp_path();
+        let config = Config::from_filepath(&path);
+        assert_eq!(config.is_ok(), true);
     }
 
 }
