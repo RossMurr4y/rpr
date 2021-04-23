@@ -22,7 +22,7 @@
 <span id="19">19</span>
 <span id="20">20</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="ident">clap</span>::{<span class="ident">Arg</span>, <span class="ident">App</span>};
+<span class="kw">use</span> <span class="ident">clap</span>::{<span class="ident">Arg</span>, <span class="ident">App</span>, <span class="ident">ArgMatches</span>};
 
 <span class="doccomment">/// Acts as both the definition for the structure of the CLI, as well as the entrance to it.</span>
 <span class="doccomment">/// The CLI is based on the `clap` crate, and has all of the out of the box features that you would expect.</span>
@@ -30,17 +30,17 @@
 <span class="doccomment">/// ```terminal</span>
 <span class="doccomment">/// rpr -h</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">process_args</span>() {
-    <span class="kw">let</span> <span class="ident">_matches</span> <span class="op">=</span> <span class="ident">App</span>::<span class="ident">new</span>(<span class="string">&quot;Reaper&quot;</span>)
-    .<span class="ident">version</span>(<span class="string">&quot;0.0.0&quot;</span>)
-    .<span class="ident">author</span>(<span class="string">&quot;Ross Murray - @rossmurr4y&quot;</span>)
-    .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;config&quot;</span>)
-        .<span class="ident">short</span>(<span class="string">&quot;c&quot;</span>)
-        .<span class="ident">long</span>(<span class="string">&quot;config&quot;</span>)
-        .<span class="ident">value_name</span>(<span class="string">&quot;FILE&quot;</span>)
-        .<span class="ident">help</span>(<span class="string">&quot;A custom Documancy config file to use. Defaults to ~/reaper.toml&quot;</span>)
-        .<span class="ident">takes_value</span>(<span class="bool-val">true</span>))
-    .<span class="ident">get_matches</span>();
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">process_args</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ArgMatches</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+    <span class="ident">App</span>::<span class="ident">new</span>(<span class="string">&quot;Reaper&quot;</span>)
+        .<span class="ident">version</span>(<span class="string">&quot;0.0.0&quot;</span>)
+        .<span class="ident">author</span>(<span class="string">&quot;Ross Murray - @rossmurr4y&quot;</span>)
+        .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;config&quot;</span>)
+            .<span class="ident">short</span>(<span class="string">&quot;c&quot;</span>)
+            .<span class="ident">long</span>(<span class="string">&quot;config&quot;</span>)
+            .<span class="ident">value_name</span>(<span class="string">&quot;FILE&quot;</span>)
+            .<span class="ident">help</span>(<span class="string">&quot;A custom Documancy config file to use. Defaults to ~/reaper.toml&quot;</span>)
+            .<span class="ident">takes_value</span>(<span class="bool-val">true</span>))
+        .<span class="ident">get_matches</span>()
 }</pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rpr"></div>
     <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
