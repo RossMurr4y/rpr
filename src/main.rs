@@ -47,7 +47,7 @@ pub mod cli;
 
 fn main() {
     use config::{Config};
-    cli::process_args();
+    let cli_args = cli::process_args();
 
     let mystr = r#"
     [[remote]]
@@ -55,7 +55,9 @@ fn main() {
     description = "Singleton configured remote repository"
     "#;
 
-    let result = Config::from_toml(mystr.to_string());
-    
-    assert_eq!(result.unwrap().remote.is_some(), true);
+    let config = Config::from_toml(mystr.to_string()).unwrap();
+    let filepath_str = cli_args.value_of("config").unwrap_or("~/reaper.toml");
+    let filepath = std::path::Path::new(filepath_str);
+    let _output = Config::to_file(filepath, config);
+    ()
 }
