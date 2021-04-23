@@ -58,6 +58,19 @@ impl Config {
         let result = fs::write(filepath, output_str.unwrap());
         result
     }
+
+    /// Initiate a new Reaper configuration file at the provided path.
+    pub fn init(filepath: &Path) -> Result<()> {
+        let config = Config {
+            remote: None
+        };
+        fs::OpenOptions::new()
+            .create(true)
+            .write(true)
+            .open(filepath)?;
+        let output = Config::to_file(filepath, config);
+        output
+    }
 }
 
 /// Remote repository configuration to be used by RPR

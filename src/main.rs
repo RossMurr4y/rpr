@@ -59,5 +59,9 @@ fn main() {
     let filepath_str = cli_args.value_of("config").unwrap_or("~/reaper.toml");
     let filepath = std::path::Path::new(filepath_str);
     let _output = Config::to_file(filepath, config);
+
+    let filepath2 = std::path::Path::new("test/blah.toml");
+    Config::init(filepath2);
     ()
+
 }
