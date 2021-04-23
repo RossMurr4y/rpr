@@ -47,9 +47,16 @@ impl Config {
 
     /// Deserialise a file from a filepath into Config
     pub fn from_filepath(input: &Path) -> Result<Self> {
-            let file_content = fs::read_to_string(&input)?;
-            let conf = Config::from_toml(file_content);
-            conf
+        let file_content = fs::read_to_string(&input)?;
+        let conf = Config::from_toml(file_content);
+        conf
+    }
+
+    /// Serialise a Config struct into a file. The file will be created if it doesn't already exist.
+    pub fn to_file(filepath: &Path, config: Config) -> Result<()> {
+        let output_str = toml::to_string_pretty(&config);
+        let result = fs::write(filepath, output_str.unwrap());
+        result
     }
 }
 
