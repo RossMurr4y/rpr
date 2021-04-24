@@ -1,3 +1,6 @@
+#[allow(unused_imports)]
+use log::*;
+
 use clap::{Arg, App, ArgMatches};
 
 /// Acts as both the definition for the structure of the CLI, as well as the entrance to it.

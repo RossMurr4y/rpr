@@ -1,7 +1,12 @@
-use serde::{Serialize, Deserialize};
 use std::path::Path;
 use std::io::{Result};
 use std::fs;
+
+#[allow(unused_imports)]
+use log::*;
+
+use serde::{Serialize, Deserialize};
+
 
 /// Reaper reads and stores configuration as TOML. It is either
 /// user-provided or created new by RPR. 

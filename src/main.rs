@@ -1,6 +1,3 @@
-#![warn(missing_docs)]
-#![warn(missing_doc_code_examples)]
-
 //! # Reaper (rpr)
 //! 
 //! Reaper is a simple command-line utility to manage your git remotes.
@@ -39,6 +36,12 @@
 //! Whilst some of the capabilities of git may be surfaced, Reaper's mission
 //! is to help users orchestrate and navigate and maintain their local workspace.
 
+
+#![warn(missing_docs)]
+#![warn(missing_doc_code_examples)]
+
+use log::*;
+
 /// Definitions for the Reaper configuration as well as interactions with it.
 pub mod config;
 
@@ -46,6 +49,7 @@ pub mod config;
 pub mod cli;
 
 fn main() {
+    env_logger::init();
     use config::{Config};
     let cli_args = cli::process_args();
 
@@ -56,4 +60,5 @@ fn main() {
     if let true = cli_args.is_present("init") {
         Config::init(filepath);
     }
+    info!("Complete");
 }
