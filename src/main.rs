@@ -51,17 +51,20 @@ pub mod cli;
 fn main() {
     // process args first, as its used to set verbosity in env_logger
     let cli_args = cli::process_args();
-    let verbosity = match cli_args.occurrences_of("v") {
+    let mut verbosity = match cli_args.occurrences_of("v") {
         0 => "info",
         1 => "debug",
         2 | _ => "trace",
+    };
+    if let true = cli_args.is_present("quiet") {
+        verbosity = "error";
     };
     let log_style = "always";
     let runtime_env = env_logger::Env::default()
         .filter_or("REAPER_LOG_LEVEL", verbosity)
         .write_style_or("REAPER_LOG_STYLE", log_style);
     env_logger::init_from_env(runtime_env);
-    println!("Log Level is {:#?}", verbosity);
+    warn!("Log level: {:#?}", verbosity);
 
     use config::{Config};
 

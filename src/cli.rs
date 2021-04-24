@@ -25,8 +25,19 @@ pub fn process_args() -> ArgMatches<'static> {
             .help("Initialise a Reaper config file. If configuration already exists, existing content will suppliment defaults"))
         .arg(Arg::with_name("v")
             .short("v")
-            .help("Runtime logging verbosity - i.e -vvv")
+            .help(
+r#"Logging verbosity: 
+
+    : ERROR, WARN, INFO
+-v  : + DEBUG
+-vv : + TRACE
+
+"#)
             .multiple(true)
             .use_delimiter(false))
+        .arg(Arg::with_name("quiet")
+            .short("q")
+            .long("quiet")
+            .help("Run quietly. Only errors will be reported"))
         .get_matches()
 }
