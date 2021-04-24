@@ -49,19 +49,11 @@ fn main() {
     use config::{Config};
     let cli_args = cli::process_args();
 
-    let mystr = r#"
-    [[remote]]
-    name = "My Example Repository"
-    description = "Singleton configured remote repository"
-    "#;
-
-    let config = Config::from_toml(mystr.to_string()).unwrap();
-    let filepath_str = cli_args.value_of("config").unwrap_or("~/reaper.toml");
+    // reaper config filepath
+    let filepath_str = cli_args.value_of("config").unwrap_or(".reaper.toml");
     let filepath = std::path::Path::new(filepath_str);
-    let _output = Config::to_file(filepath, config);
 
-    let filepath2 = std::path::Path::new("test/blah.toml");
-    Config::init(filepath2);
-    ()
-
+    if let true = cli_args.is_present("init") {
+        Config::init(filepath);
+    }
 }

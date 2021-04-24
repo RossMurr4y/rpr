@@ -48,28 +48,28 @@ impl Config {
     /// Deserialise a file from a filepath into Config
     pub fn from_filepath(input: &Path) -> Result<Self> {
         let file_content = fs::read_to_string(&input)?;
-        let conf = Config::from_toml(file_content);
-        conf
+        Config::from_toml(file_content)
     }
 
     /// Serialise a Config struct into a file. The file will be created if it doesn't already exist.
     pub fn to_file(filepath: &Path, config: Config) -> Result<()> {
         let output_str = toml::to_string_pretty(&config);
-        let result = fs::write(filepath, output_str.unwrap());
-        result
+        fs::write(filepath, output_str.unwrap())
     }
 
     /// Initiate a new Reaper configuration file at the provided path.
     pub fn init(filepath: &Path) -> Result<()> {
-        let config = Config {
+        let default_conf = Config {
             remote: None
         };
+        // Create all parent directories necessary
+        fs::create_dir_all(filepath)?;
+        println!("testing, {:#?}", filepath);
         fs::OpenOptions::new()
             .create(true)
             .write(true)
             .open(filepath)?;
-        let output = Config::to_file(filepath, config);
-        output
+        Config::to_file(filepath, default_conf)
     }
 }
 

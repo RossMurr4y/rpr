@@ -14,7 +14,11 @@ pub fn process_args() -> ArgMatches<'static> {
             .short("c")
             .long("config")
             .value_name("FILE")
-            .help("A custom Documancy config file to use. Defaults to ~/reaper.toml")
+            .help("A custom Reaper config file to use. Defaults to ~/reaper.toml")
             .takes_value(true))
+        .arg(Arg::with_name("init")
+            .short("i")
+            .long("init")
+            .help("Initialise a Reaper config file. If configuration already exists, existing content will suppliment defaults"))
         .get_matches()
 }
