@@ -49,9 +49,21 @@ pub mod config;
 pub mod cli;
 
 fn main() {
-    env_logger::init();
-    use config::{Config};
+    // process args first, as its used to set verbosity in env_logger
     let cli_args = cli::process_args();
+    let verbosity = match cli_args.occurrences_of("v") {
+        0 => "info",
+        1 => "debug",
+        2 | _ => "trace",
+    };
+    let log_style = "always";
+    let runtime_env = env_logger::Env::default()
+        .filter_or("REAPER_LOG_LEVEL", verbosity)
+        .write_style_or("REAPER_LOG_STYLE", log_style);
+    env_logger::init_from_env(runtime_env);
+    println!("Log Level is {:#?}", verbosity);
+
+    use config::{Config};
 
     // reaper config filepath
     let filepath_str = cli_args.value_of("config").unwrap_or(".reaper.toml");
