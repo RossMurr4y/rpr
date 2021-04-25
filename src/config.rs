@@ -101,8 +101,8 @@ impl Config {
 /// ```
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Remote {
-    /// A human-readable identifier for the remote.
-    pub name: Option<String>,
+    /// A human-readable identifier for the remote. Mandatory.
+    pub name: String,
     /// A brief descriptor for the remote - purely for identification purposes only.
     pub description: Option<String>,
     /// The URL of the remote.
