@@ -276,7 +276,7 @@ mod tests {
     }
 
     #[test]
-    fn remote_from_builder_pattern() {
+    fn remote_from_builder_pattern_one_liner() {
         let name = String::from("Example001");
         let ex = Remote::new(name)
             .description(String::from("This is an example remote I am tracking"))
@@ -285,6 +285,22 @@ mod tests {
             .branch(String::from("development"))
             .path(String::from("/"))
             .create();
+        assert_eq!(ex.url, Some(String::from("http://github.com/rossmurr4y/rpr")));
+    }
+
+    #[test]
+    fn remote_from_builder_pattern_var_reassignment() {
+        // this test ensures that the current builder pattern implimentation
+        // still allows for attributes to be added proceedurally.
+        // This is different from the single-line approach above.
+        let name = String::from("Example001");
+        let ex = Remote::new(name);
+        let ex = ex.description(String::from("This is an example remote I am tracking"));
+        let ex = ex.url(String::from("http://github.com/rossmurr4y/rpr"));
+        let ex = ex.upstream(String::from("http://github.com/some_org/rpr"));
+        let ex = ex.branch(String::from("development"));
+        let ex = ex.path(String::from("/"));
+        let ex = ex.create();
         assert_eq!(ex.url, Some(String::from("http://github.com/rossmurr4y/rpr")));
     }
 
