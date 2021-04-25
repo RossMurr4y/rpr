@@ -1,3 +1,4 @@
+use std::default::Default;
 use std::path::Path;
 use std::io::{Result};
 use std::fs;
@@ -96,8 +97,6 @@ impl Config {
 /// upstream = "https://github.com/rossmurr4y/rpr.git"
 /// branch = "main"
 /// path = "docs/"
-/// org = "exampleorg"
-/// platform = "github" 
 /// ```
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Remote {
@@ -113,10 +112,28 @@ pub struct Remote {
     pub branch: Option<String>,
     /// A path within the repository to the target content.
     pub path: Option<String>,
-    /// An organisation to which this remote belongs.
-    pub org: Option<String>,
-    /// The git platform of the remote repository.
-    pub platform: Option<String>,
+}
+
+/// Sets default values for a Remote, allowing a new remote to be created by only specifying the differences from default, plus any mandatory values.
+/// 
+/// Examples
+/// 
+/// ```
+/// use std::default::Default;
+/// let r = super::Remote { name: String::from("ExampleRemote"), ..Default::default() };
+/// assert_eq!(r.branch.unwrap(), String::from("main"));
+/// ```
+impl Default for Remote {
+    fn default() -> Remote {
+        Remote {
+            name: String::from(""),
+            description: Some(String::from("")),
+            url: Some(String::from("")),
+            branch: Some(String::from("main")),
+            path: Some(String::from("")),
+            upstream: None,
+        }
+    }
 }
 
 #[cfg(test)]
@@ -125,7 +142,6 @@ mod tests {
     use crate::config::{Config};
     use std::io::Write;
     use tempfile::NamedTempFile;
-
 
     #[test]
     fn config_from_toml_str_no_remote() {
@@ -156,8 +172,6 @@ mod tests {
         upstream = "https://github.com/rossmurr4y/rpr.git"
         branch = "main"
         path = "docs/"
-        org = "exampleorg"
-        platform = "github"
         
         [[remote]]
         name = "My Example Repository"
@@ -180,8 +194,6 @@ mod tests {
             upstream = "https://github.com/rossmurr4y/rpr.git"
             branch = "main"
             path = "docs/"
-            org = "exampleorg"
-            platform = "github"
             
             [[remote]]
             name = "My Example Repository"
@@ -190,6 +202,13 @@ mod tests {
         let path = &file.into_temp_path();
         let config = Config::from_filepath(&path);
         assert_eq!(config.is_ok(), true);
+    }
+
+    #[test]
+    fn remote_from_defaults() {
+        use std::default::Default;
+        let r = super::Remote { name: String::from("ExampleRemote"), ..Default::default() };
+        assert_eq!(r.branch.unwrap(), String::from("main"));
     }
 
 }
