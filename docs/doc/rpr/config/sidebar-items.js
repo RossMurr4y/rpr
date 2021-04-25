@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Config","Reaper reads and stores configuration as TOML. It is either user-provided or created new by RPR. "],["Remote","Remote repository configuration to be used by RPR"]]});
+initSidebarItems({"struct":[["Config","Reaper reads and stores configuration as TOML. It is either user-provided or created new by RPR. "],["Remote","A Repository builder for the Repository struct. "],["Repository","Remote repository configuration to be used by RPR"]]});

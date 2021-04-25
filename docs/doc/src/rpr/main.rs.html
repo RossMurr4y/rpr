@@ -68,10 +68,19 @@
 <span id="65">65</span>
 <span id="66">66</span>
 <span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
-<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_doc_code_examples</span>)]</span>
-
 <span class="doccomment">//! # Reaper (rpr)</span>
 <span class="doccomment">//! </span>
 <span class="doccomment">//! Reaper is a simple command-line utility to manage your git remotes.</span>
@@ -110,6 +119,12 @@
 <span class="doccomment">//! Whilst some of the capabilities of git may be surfaced, Reaper&#39;s mission</span>
 <span class="doccomment">//! is to help users orchestrate and navigate and maintain their local workspace.</span>
 
+
+<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
+<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_doc_code_examples</span>)]</span>
+
+<span class="kw">use</span> <span class="ident">log</span>::<span class="kw-2">*</span>;
+
 <span class="doccomment">/// Definitions for the Reaper configuration as well as interactions with it.</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">config</span>;
 
@@ -117,24 +132,33 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">cli</span>;
 
 <span class="kw">fn</span> <span class="ident">main</span>() {
-    <span class="kw">use</span> <span class="ident">config</span>::{<span class="ident">Config</span>};
+    <span class="comment">// process args first, as its used to set verbosity in env_logger</span>
     <span class="kw">let</span> <span class="ident">cli_args</span> <span class="op">=</span> <span class="ident">cli</span>::<span class="ident">process_args</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">verbosity</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">cli_args</span>.<span class="ident">occurrences_of</span>(<span class="string">&quot;v&quot;</span>) {
+        <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;info&quot;</span>,
+        <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;debug&quot;</span>,
+        <span class="number">2</span> <span class="op">|</span> <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;trace&quot;</span>,
+    };
+    <span class="kw">if</span> <span class="kw">let</span> <span class="bool-val">true</span> <span class="op">=</span> <span class="ident">cli_args</span>.<span class="ident">is_present</span>(<span class="string">&quot;quiet&quot;</span>) {
+        <span class="ident">verbosity</span> <span class="op">=</span> <span class="string">&quot;error&quot;</span>;
+    };
+    <span class="kw">let</span> <span class="ident">log_style</span> <span class="op">=</span> <span class="string">&quot;always&quot;</span>;
+    <span class="kw">let</span> <span class="ident">runtime_env</span> <span class="op">=</span> <span class="ident">env_logger</span>::<span class="ident">Env</span>::<span class="ident">default</span>()
+        .<span class="ident">filter_or</span>(<span class="string">&quot;REAPER_LOG_LEVEL&quot;</span>, <span class="ident">verbosity</span>)
+        .<span class="ident">write_style_or</span>(<span class="string">&quot;REAPER_LOG_STYLE&quot;</span>, <span class="ident">log_style</span>);
+    <span class="ident">env_logger</span>::<span class="ident">init_from_env</span>(<span class="ident">runtime_env</span>);
+    <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;Log level: {:#?}&quot;</span>, <span class="ident">verbosity</span>);
 
-    <span class="kw">let</span> <span class="ident">mystr</span> <span class="op">=</span> <span class="string">r#&quot;
-    [[remote]]
-    name = &quot;My Example Repository&quot;
-    description = &quot;Singleton configured remote repository&quot;
-    &quot;#</span>;
+    <span class="kw">use</span> <span class="ident">config</span>::{<span class="ident">Config</span>};
 
-    <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">Config</span>::<span class="ident">from_toml</span>(<span class="ident">mystr</span>.<span class="ident">to_string</span>()).<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">filepath_str</span> <span class="op">=</span> <span class="ident">cli_args</span>.<span class="ident">value_of</span>(<span class="string">&quot;config&quot;</span>).<span class="ident">unwrap_or</span>(<span class="string">&quot;~/reaper.toml&quot;</span>);
+    <span class="comment">// reaper config filepath</span>
+    <span class="kw">let</span> <span class="ident">filepath_str</span> <span class="op">=</span> <span class="ident">cli_args</span>.<span class="ident">value_of</span>(<span class="string">&quot;config&quot;</span>).<span class="ident">unwrap_or</span>(<span class="string">&quot;.reaper.toml&quot;</span>);
     <span class="kw">let</span> <span class="ident">filepath</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">path</span>::<span class="ident">Path</span>::<span class="ident">new</span>(<span class="ident">filepath_str</span>);
-    <span class="kw">let</span> <span class="ident">_output</span> <span class="op">=</span> <span class="ident">Config</span>::<span class="ident">to_file</span>(<span class="ident">filepath</span>, <span class="ident">config</span>);
 
-    <span class="kw">let</span> <span class="ident">filepath2</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">path</span>::<span class="ident">Path</span>::<span class="ident">new</span>(<span class="string">&quot;test/blah.toml&quot;</span>);
-    <span class="ident">Config</span>::<span class="ident">init</span>(<span class="ident">filepath2</span>);
-    ()
-
+    <span class="kw">if</span> <span class="kw">let</span> <span class="bool-val">true</span> <span class="op">=</span> <span class="ident">cli_args</span>.<span class="ident">is_present</span>(<span class="string">&quot;init&quot;</span>) {
+        <span class="ident">Config</span>::<span class="ident">init</span>(<span class="ident">filepath</span>);
+    }
+    <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Complete&quot;</span>);
 }</pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rpr"></div>
     <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
