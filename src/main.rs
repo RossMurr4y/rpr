@@ -40,23 +40,26 @@
 #![warn(missing_docs)]
 #![warn(missing_doc_code_examples)]
 
-use log::*;
-
 /// Definitions for the Reaper configuration as well as interactions with it.
 pub mod config;
 
-/// Definitions for the Reaper CLI subcommands, arguments and associated configuration.
-pub mod cli;
+/// State definition and management.
+pub mod state;
+
+use log::*;
+use state::*;
 
 fn main() {
-    // process args first, as its used to set verbosity in env_logger
-    let cli_args = cli::process_args();
-    let mut verbosity = match cli_args.occurrences_of("v") {
+    
+    // Initialise Reaper's State
+    let mut state = State::initialize();
+
+    let mut verbosity = match state.inputs.occurrences_of("v") {
         0 => "info",
         1 => "debug",
         2 | _ => "trace",
     };
-    if let true = cli_args.is_present("quiet") {
+    if let true = state.inputs.is_present("quiet") {
         verbosity = "error";
     };
     let log_style = "always";
@@ -69,10 +72,10 @@ fn main() {
     use config::{Config};
 
     // reaper config filepath
-    let filepath_str = cli_args.value_of("config").unwrap_or(".reaper.toml");
+    let filepath_str = state.inputs.value_of("config").unwrap_or(".reaper.toml");
     let filepath = std::path::Path::new(filepath_str);
 
-    if let true = cli_args.is_present("init") {
+    if let true = state.inputs.is_present("init") {
         Config::init(filepath);
     }
     info!("Complete");
