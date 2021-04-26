@@ -5,6 +5,7 @@ use chrono::Utc;
 /// Definitions for the Reaper CLI subcommands, arguments and associated configuration.
 pub mod cli;
 
+#[derive(Debug)]
 /// State is the current in-memory Reaper runtime state.
 pub struct State<'a> {
     /// The system time that the State was initialized
@@ -12,29 +13,42 @@ pub struct State<'a> {
     /// All inputs that were passed at the time of initialization
     pub inputs: ArgMatches<'a>,
     /// The queue of Task's requring actioning.
-    pub queue: Option<Vec<Task>>,
+    pub queue: Vec<Task>,
 }
 
 impl State<'_> {
-        /// Initialise the State
-        pub fn initialize() -> Self {
+    /// Initialise the State
+    pub fn initialize() -> Self {
 
-            // Retrieval of the CLI params/args specified
-            let cli_matches = cli::process_args();
+        /// Retrieval of the CLI params/args specified
+        let cli_matches = cli::process_args();
 
-            State {
-                process_start: Utc::now().to_rfc3339(),
-                inputs: cli_matches,
-                queue: Some(Vec::new()),
-            }
-        }
-    
-        /// Appends a new Task into the State's queue for processing.
-        pub fn queue_task(task: Task) -> Self {
-            todo!();
-        }
+        let mut state = State {
+            process_start: Utc::now().to_rfc3339(),
+            inputs: cli_matches,
+            queue: Vec::new(),
+        };
+
+        // Stage initialisation Tasks
+        // Set the logging level
+        let log_level = Action::new(String::from("set_log_level")).priority(100).ready();
+        state.queue_task(log_level);
+
+        // Evaluate the rpr configuration file
+        let rpr_conf = Action::new(String::from("set_state_from_rpr_conf")).priority(200).ready();
+        &state.queue_task(rpr_conf);
+
+        state
+    }
+
+    /// Appends a new Task into the State's queue for processing.
+    pub fn queue_task(&mut self, task: Task) -> &Self {
+        self.queue.push(task);
+        self
+    }
 }
 
+#[derive(Debug)]
 /// Task's are passed to a State's queue for processing. They follow the builder-pattern, and are typically created through Action's rather than created themselves.
 pub struct Task {
     /// A system-managed identifier
@@ -46,7 +60,6 @@ pub struct Task {
     /// Arguments to be provided to the command
     args: Vec<String>,
 }
-
 
 /// Action's are a builder for Task's. They should first be created with `new()`, assembled as necessary and then translated into a Task with `()`.
 pub struct Action {
@@ -94,7 +107,7 @@ impl Action {
     }
 
     /// Builds the Action into a Task.
-    pub fn ready(mut self) -> Task {
+    pub fn ready(self) -> Task {
         Task {
             id: self.id,
             priority: self.priority,

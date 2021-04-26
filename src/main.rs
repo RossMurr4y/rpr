@@ -79,4 +79,5 @@ fn main() {
         Config::init(filepath);
     }
     info!("Complete");
+    println!("{:#?}", state);
 }
