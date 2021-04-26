@@ -80,6 +80,10 @@
 <span id="77">77</span>
 <span id="78">78</span>
 <span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! # Reaper (rpr)</span>
 <span class="doccomment">//! </span>
@@ -123,23 +127,26 @@
 <span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
 <span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_doc_code_examples</span>)]</span>
 
-<span class="kw">use</span> <span class="ident">log</span>::<span class="kw-2">*</span>;
-
 <span class="doccomment">/// Definitions for the Reaper configuration as well as interactions with it.</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">config</span>;
 
-<span class="doccomment">/// Definitions for the Reaper CLI subcommands, arguments and associated configuration.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">cli</span>;
+<span class="doccomment">/// State definition and management.</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">state</span>;
+
+<span class="kw">use</span> <span class="ident">log</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">state</span>::<span class="kw-2">*</span>;
 
 <span class="kw">fn</span> <span class="ident">main</span>() {
-    <span class="comment">// process args first, as its used to set verbosity in env_logger</span>
-    <span class="kw">let</span> <span class="ident">cli_args</span> <span class="op">=</span> <span class="ident">cli</span>::<span class="ident">process_args</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">verbosity</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">cli_args</span>.<span class="ident">occurrences_of</span>(<span class="string">&quot;v&quot;</span>) {
+    
+    <span class="comment">// Initialise Reaper&#39;s State</span>
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">initialize</span>();
+
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">verbosity</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">state</span>.<span class="ident">inputs</span>.<span class="ident">occurrences_of</span>(<span class="string">&quot;v&quot;</span>) {
         <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;info&quot;</span>,
         <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;debug&quot;</span>,
         <span class="number">2</span> <span class="op">|</span> <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;trace&quot;</span>,
     };
-    <span class="kw">if</span> <span class="kw">let</span> <span class="bool-val">true</span> <span class="op">=</span> <span class="ident">cli_args</span>.<span class="ident">is_present</span>(<span class="string">&quot;quiet&quot;</span>) {
+    <span class="kw">if</span> <span class="kw">let</span> <span class="bool-val">true</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">inputs</span>.<span class="ident">is_present</span>(<span class="string">&quot;quiet&quot;</span>) {
         <span class="ident">verbosity</span> <span class="op">=</span> <span class="string">&quot;error&quot;</span>;
     };
     <span class="kw">let</span> <span class="ident">log_style</span> <span class="op">=</span> <span class="string">&quot;always&quot;</span>;
@@ -152,13 +159,14 @@
     <span class="kw">use</span> <span class="ident">config</span>::{<span class="ident">Config</span>};
 
     <span class="comment">// reaper config filepath</span>
-    <span class="kw">let</span> <span class="ident">filepath_str</span> <span class="op">=</span> <span class="ident">cli_args</span>.<span class="ident">value_of</span>(<span class="string">&quot;config&quot;</span>).<span class="ident">unwrap_or</span>(<span class="string">&quot;.reaper.toml&quot;</span>);
+    <span class="kw">let</span> <span class="ident">filepath_str</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">inputs</span>.<span class="ident">value_of</span>(<span class="string">&quot;config&quot;</span>).<span class="ident">unwrap_or</span>(<span class="string">&quot;.reaper.toml&quot;</span>);
     <span class="kw">let</span> <span class="ident">filepath</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">path</span>::<span class="ident">Path</span>::<span class="ident">new</span>(<span class="ident">filepath_str</span>);
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="bool-val">true</span> <span class="op">=</span> <span class="ident">cli_args</span>.<span class="ident">is_present</span>(<span class="string">&quot;init&quot;</span>) {
+    <span class="kw">if</span> <span class="kw">let</span> <span class="bool-val">true</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">inputs</span>.<span class="ident">is_present</span>(<span class="string">&quot;init&quot;</span>) {
         <span class="ident">Config</span>::<span class="ident">init</span>(<span class="ident">filepath</span>);
     }
     <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Complete&quot;</span>);
+    <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;{:#?}&quot;</span>, <span class="ident">state</span>);
 }</pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rpr"></div>
     <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>

@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["main",""]],"mod":[["cli","Definitions for the Reaper CLI subcommands, arguments and associated configuration."],["config","Definitions for the Reaper configuration as well as interactions with it."]]});
+initSidebarItems({"fn":[["main",""]],"mod":[["config","Definitions for the Reaper configuration as well as interactions with it."],["state","State definition and management."]]});
